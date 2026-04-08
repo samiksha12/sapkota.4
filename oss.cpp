@@ -417,11 +417,11 @@ int main(int argc, char *argv[])
     double cpuUtil = (double)totalTime /
                      (totalTime + overheadTime + idleTime);
 
-    cout << "Total time:" << totalTime << "\n"; // total time used by process
+    cout << "Total time: " << totalTime << "\n"; // total time used by process
     // time spent on scheduling, handling a block that is moving a process in and out of blocked queue everything gets added for overheadtime
-    cout << "Overhead Time:" << overheadTime << "\n";
+    cout << "Overhead Time: " << overheadTime << "\n";
     // idle time of cpu
-    cout << "Idle Time:" << idleTime << "\n";
+    cout << "Idle Time: " << idleTime << "\n";
 
     cout << "CPU utilization: " << cpuUtil * 100 << "%\n";
     cleanup();
