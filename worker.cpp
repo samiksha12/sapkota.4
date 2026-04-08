@@ -18,45 +18,63 @@ struct msgbuffer
 
 int main()
 {
+
+    srand(getpid());
+
     int msgqid = msgget(ftok("msgq.txt", 1), 0666);
 
     msgbuffer msg;
 
-    int totalTime = 0;
+    int totalNeeded = 0;
+    int totalUsed = 0;
+
+    cout << "WORKER PID " << getpid() << " started\n";
 
     while (true)
     {
-        // wait for message from OSS
+
         msgrcv(msgqid, &msg, sizeof(msg) - sizeof(long), getpid(), 0);
 
         if (msg.flag == INIT)
         {
-            totalTime = msg.intData;
+            totalNeeded = msg.intData;
 
             cout << "WORKER " << getpid()
-                 << " received INIT total time: "
-                 << totalTime << endl;
+                 << " INIT total=" << totalNeeded << endl;
         }
         else if (msg.flag == RUN)
         {
+
             int quantum = msg.intData;
+            int decision = rand() % 100;
+            int used;
+            int remaining = totalNeeded - totalUsed;
+            if (remaining <= quantum)
+            {
+                used = -remaining; // 0 - if negative oss will know it is terminating message
+                cout << "WORKER " << getpid() << " TERMINATING\n";
+            }
+            else if (decision < 20)
+            {
+                used = rand() % quantum; // 2 - use part & block
+                cout << "WORKER " << getpid() << " BLOCKED\n";
+            }
+            else
+            {
+                used = quantum; // 1 - use it all
+                cout << "WORKER " << getpid() << " FULL QUANTUM\n";
+            }
 
-            cout << "WORKER " << getpid()
-                 << " received RUN quantum: "
-                 << quantum << endl;
-
-            int used = quantum;
+            totalUsed += abs(used);
 
             msg.mtype = getppid();
             msg.intData = used;
 
             msgsnd(msgqid, &msg, sizeof(msg) - sizeof(long), 0);
-
-            cout << "WORKER " << getpid()
-                 << " sending back used time: "
-                 << used << endl;
-
-            break; // exit after one cycle
+            if (used < 0)
+            {
+                break;
+            }
         }
     }
 
