@@ -24,3 +24,19 @@ const int BLOCK_OVERHEAD = 3000;
 const int UNBLOCK_OVERHEAD = 3000;
 const int FORK_OVERHEAD = 10000;
 and add them to clock whereever I am using CPU activity like scheduling the process from ready queue , Adding the process to block queue, and etc.
+
+Prompt: How do I add 1000 line limit to log file - ChatGPT
+Suggestion: 
+Previously I was logging the messages without constarint
+if (logLineCount < MAX_LOG_LINES)
+    {
+        logfile << s;
+        logfile.flush();
+
+        // Count number of lines in this string
+        for (size_t i = 0; i < s.length(); i++)
+        {
+            if (s[i] == '\n')
+                logLineCount++;
+        }
+    }

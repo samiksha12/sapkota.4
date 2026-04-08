@@ -27,6 +27,8 @@ const int BLOCK_OVERHEAD = 3000;
 const int UNBLOCK_OVERHEAD = 3000;
 const int FORK_OVERHEAD = 10000;
 
+int logLineCount = 0;
+const int MAX_LOG_LINES = 1000;
 int shm_id;
 int *customClock = nullptr;
 int msgqid;
@@ -61,8 +63,19 @@ struct msgbuffer
 void logmsg(string s)
 {
     cout << s;
-    logfile << s;
-    logfile.flush();
+
+    if (logLineCount < MAX_LOG_LINES)
+    {
+        logfile << s;
+        logfile.flush();
+
+        // Count number of lines in this string
+        for (size_t i = 0; i < s.length(); i++)
+        {
+            if (s[i] == '\n')
+                logLineCount++;
+        }
+    }
 }
 
 void incClock(int sec, int nano)
